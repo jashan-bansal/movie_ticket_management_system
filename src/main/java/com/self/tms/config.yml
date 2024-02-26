@@ -1,0 +1,13 @@
+spring:
+  application:
+    name: bms
+
+logging:
+  level:
+    root: INFO
+    com.self: DEBUG
+  pattern:
+    console: "%date{ISO8601} - [%level] - [%thread] - [%X{Local_Request_Id}] - %logger{36} - %message%n"
+
+server:
+  port: 8080
