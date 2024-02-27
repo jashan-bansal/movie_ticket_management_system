@@ -9,7 +9,7 @@ import java.util.UUID;
 @Data
 public class ShowCreateRequest {
     UUID movieId;
-    Theatre.Screen screen;
+    UUID screen;
     Date showStartTime;
     UUID theatreId;
 }

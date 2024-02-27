@@ -11,13 +11,13 @@ public class Show {
     UUID movieId;
 
     UUID theatreId;
-    Theatre.Screen screen;
+    UUID screenId;
     Date showStartTime;
 
-    public Show(UUID movieId, Theatre.Screen screen, Date showStartTime, UUID theatreId) {
+    public Show(UUID movieId, UUID screenId, Date showStartTime, UUID theatreId) {
         this.showId = UUID.randomUUID();
         this.movieId = movieId;
-        this.screen = screen;
+        this.screenId = screenId;
         this.showStartTime = showStartTime;
         this.theatreId = theatreId;
     }

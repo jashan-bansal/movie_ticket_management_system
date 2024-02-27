@@ -1,4 +1,4 @@
-package com.self.tms.resources;
+package com.self.tms.routers;
 
 
 import com.self.tms.controllers.ShowController;
@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import java.util.Objects;
 import java.util.UUID;
@@ -22,7 +21,7 @@ import java.util.UUID;
 @RequestMapping("api/v1/show")
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
-public class ShowResource {
+public class ShowRouter {
 
     @Autowired
     private ShowController showController;
@@ -43,7 +42,7 @@ public class ShowResource {
     }
 
     @GetMapping("")
-    public ResponseEntity fetchTheatreMovieShows(@QueryParam("movieId") UUID movieId, @QueryParam("theatreId") UUID theatreId) {
+    public ResponseEntity fetchTheatreMovieShows(@RequestParam("movieId") UUID movieId, @RequestParam("theatreId") UUID theatreId) {
         try {
             return showController.fetchTheatreMovieShows(movieId, theatreId);
         } catch (Exception e) {

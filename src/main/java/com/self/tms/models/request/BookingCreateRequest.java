@@ -9,6 +9,6 @@ import java.util.UUID;
 @Data
 public class BookingCreateRequest {
     UUID showId;
-    List<Seat> seats;
+    List<String> seats;
     UUID userId;
 }

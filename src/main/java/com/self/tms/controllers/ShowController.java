@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
+import javax.ws.rs.core.Response;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -25,16 +26,16 @@ public class ShowController {
     public ResponseEntity addShow(ShowCreateRequest showCreateRequest) {
         try {
             UUID movieId = showCreateRequest.getMovieId();
-            Theatre.Screen screen = showCreateRequest.getScreen();
+            UUID screenId = showCreateRequest.getTheatreId();
             Date showStartTime = showCreateRequest.getShowStartTime();
             UUID theatreId = showCreateRequest.getTheatreId();
 
-            if (movieId == null || screen == null || showStartTime == null || theatreId == null) {
+            if (movieId == null || screenId == null || showStartTime == null || theatreId == null) {
                 log.error("Invalid request to add show: {}", showCreateRequest);
                 return ResponseEntity.badRequest().build();
             }
 
-            showService.addShow(movieId, screen, showStartTime, theatreId);
+            showService.addShow(movieId, screenId, showStartTime, theatreId);
             return ResponseEntity.ok("Show added successfully!");
         } catch (Exception e) {
             e.printStackTrace();
@@ -64,6 +65,12 @@ public class ShowController {
             }
 
             List<Show> shows = showService.getShowsForMovieAndTheatre(movieId, theatreId);
+
+            if (shows.isEmpty()) {
+                return ResponseEntity.status(Response.Status.NOT_FOUND.getStatusCode())
+                        .body("No shows available for movieId: " + movieId + " and theatreId: " + theatreId);
+            }
+
             return ResponseEntity.ok(shows);
         } catch (Exception e) {
             e.printStackTrace();

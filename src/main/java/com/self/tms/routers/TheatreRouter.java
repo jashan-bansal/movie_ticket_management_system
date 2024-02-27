@@ -1,4 +1,4 @@
-package com.self.tms.resources;
+package com.self.tms.routers;
 
 import com.self.tms.controllers.TheatreController;
 import com.self.tms.models.request.TheatreCreateRequest;
@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 
 @Slf4j
@@ -19,7 +18,7 @@ import javax.ws.rs.core.MediaType;
 @Data
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
-public class TheatreResource {
+public class TheatreRouter {
 
     @Autowired
     private final TheatreController theatreController;
@@ -35,7 +34,7 @@ public class TheatreResource {
     }
 
     @GetMapping("")
-    public ResponseEntity getTheatresInCity(@QueryParam("city") String city) {
+    public ResponseEntity getTheatresInCity(@RequestParam("city") String city) {
         try {
             return theatreController.getTheatresInCity(city);
         } catch (Exception e) {
@@ -44,10 +43,10 @@ public class TheatreResource {
         }
     }
 
-    @PostMapping("/initialize")
-    public ResponseEntity initializeTheatre() {
+    @PostMapping("/initialiseMovieInTheatre")
+    public ResponseEntity initialiseMovieInTheatre() {
         try {
-            return theatreController.initializeTheatre();
+            return theatreController.initialiseMovieInTheatre();
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.internalServerError().build();

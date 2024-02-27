@@ -1,28 +1,40 @@
 package com.self.tms.models;
 
+import jakarta.annotation.PostConstruct;
 import lombok.Builder;
 import lombok.Data;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 @Data
 @Builder
 public class Theatre {
-    UUID id;
-    String name;
-    List<Screen> screens;
-    List<Movie> runningMovies;
+    private UUID id;
+    private String name;
+    private List<Screen> screens;
+    private List<Movie> runningMovies;
+
+    @PostConstruct
+    public void Theatre() {
+        id = UUID.randomUUID();
+    }
 
     public void addScreen(Screen screen){
-        this.screens.add(screen);
+        if (Objects.isNull(screens)) {
+            screens = new ArrayList<>();
+        }
+        screens.add(screen);
     }
 
     public void addMovie(Movie movie){
-        this.runningMovies.add(movie);
+        if (Objects.isNull(runningMovies)) {
+            runningMovies = new ArrayList<>();
+        }
+        runningMovies.add(movie);
     }
-
 
     @Data
     public static class Screen {
@@ -56,8 +68,8 @@ public class Theatre {
             char rowSeries = 'A';
 
             for (int row = 0; row < rows; row++) {
-                for (int j = 0; j < 10; j++) {
-                    seats.add(new Seat(row, rowSeries));
+                for (int seatNumber = 0; seatNumber < 10; seatNumber++) {
+                    seats.add(new Seat( rowSeries + String.valueOf(seatNumber)));
                 }
                 rowSeries++;
             }

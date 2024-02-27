@@ -20,7 +20,7 @@ public class ShowService {
     private static final String MOVIE = "movie";
     private static final String THEATRE = "theatre";
 
-    private Map<UUID, List<Seat>> showLockedSeatMap;
+    private Map<UUID, List<String>> showLockedSeatMap;
 
     private final TheatreServices theatreServices;
 
@@ -32,13 +32,13 @@ public class ShowService {
         showLockedSeatMap = new HashMap<>();
     }
 
-    public void addShow(UUID movieId, Theatre.Screen screen, Date showStartTime, UUID theatreId) {
-        Show show = new Show(movieId, screen, showStartTime, theatreId);
+    public void addShow(UUID movieId, UUID screenId, Date showStartTime, UUID theatreId) {
+        Show show = new Show(movieId, screenId, showStartTime, theatreId);
         showMap.put(show.getShowId(), show);
         showLockedSeatMap.put(show.getShowId(), new ArrayList<>());
     }
 
-    public List<Seat> getShowLockedSeatMap(UUID showId) {
+    public List<String> getShowLockedSeatMap(UUID showId) {
         if (Objects.isNull(showId)) {
             throw new RuntimeException("Invalid show id");
         }
@@ -98,8 +98,13 @@ public class ShowService {
 
     public void initializeShows() {
         log.info("Initializing shows");
-        theatreServices.getTheatreInCity("bangalore").forEach(theatre -> {
-            addShow(theatre.getRunningMovies().get(0).getMovieId(), theatre.getScreens().get(0), new Date(), theatre.getId());
+        theatreServices.getCityToTheatresMap().keySet().forEach(city -> {
+            List<Theatre> theatres = theatreServices.getTheatreInCity(city);
+            theatres.forEach(theatre -> {
+                theatre.getRunningMovies().forEach(movie -> {
+                    addShow(movie.getMovieId(), theatre.getScreens().get(0).getScreenId(), new Date(), theatre.getId());
+                });
+            });
         });
     }
 

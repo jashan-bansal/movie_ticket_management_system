@@ -8,6 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
+import javax.ws.rs.NotFoundException;
+import javax.ws.rs.core.Response;
 import java.util.Objects;
 
 @Component
@@ -43,12 +45,17 @@ public class TheatreController {
         try {
             if (city == null) {
                 log.error("Invalid request to fetch theatres for city: {}", city);
-                return ResponseEntity.badRequest().build();
+                return ResponseEntity.status(400).body("Invalid request");
             }
             return ResponseEntity.ok(theatreService.getTheatreInCity(city));
-        } catch (Exception e) {
+        } catch (NotFoundException e) {
             e.printStackTrace();
-            throw e;
+            log.error("Error occurred while fetching theatres: " + e.getMessage());
+            return ResponseEntity.status(Response.Status.NOT_FOUND.getStatusCode()).body(e.getMessage());
+        } catch (Exception e) {
+            log.error("Error occurred while fetching theatres: " + e.getMessage());
+            e.printStackTrace();
+            return ResponseEntity.internalServerError().body("Error occurred while fetching theatres.");
         }
     }
 
@@ -58,7 +65,22 @@ public class TheatreController {
             return ResponseEntity.ok().build();
         } catch (Exception e) {
             e.printStackTrace();
-            throw e;
+            return ResponseEntity.internalServerError().body("Error occurred while initializing theatres.");
+        }
+    }
+
+    public ResponseEntity initialiseMovieInTheatre() {
+        try {
+            theatreService.initialiseMovieInTheatre();
+            return ResponseEntity.ok().body("Movie initialised in theatre");
+        } catch (NotFoundException e) {
+            log.error("Error occurred while initializing movie in theatre: " + e.getMessage());
+            e.printStackTrace();
+            return ResponseEntity.status(Response.Status.NOT_FOUND.getStatusCode()).body(e.getMessage());
+        } catch (Exception e) {
+            log.error("Error occurred while initializing movie in theatre: " + e.getMessage());
+            e.printStackTrace();
+            return ResponseEntity.internalServerError().body("Error occurred while initializing movie in theatre.");
         }
     }
 

@@ -4,6 +4,7 @@ import com.self.tms.models.User;
 import lombok.Data;
 import org.springframework.stereotype.Service;
 
+import javax.ws.rs.NotFoundException;
 import java.util.*;
 
 @Service
@@ -27,6 +28,9 @@ public class UserService {
     }
 
     public User getUser(UUID userId){
+        if (!userMap.containsKey(userId)) {
+            throw new NotFoundException("User not found");
+        }
         return userMap.get(userId);
     }
 

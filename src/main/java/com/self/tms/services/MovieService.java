@@ -4,9 +4,8 @@ import com.self.tms.models.Movie;
 import lombok.Data;
 import org.springframework.stereotype.Service;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import javax.ws.rs.NotFoundException;
+import java.util.*;
 
 @Service
 @Data
@@ -21,8 +20,16 @@ public class MovieService {
     }
 
     public void addMovie(Movie movie) {
-        moviesNameToMovieMap.put(movie.getMovieName(), movie);
+        moviesNameToMovieMap.put(movie.getMovieName().toLowerCase(), movie);
         movieMap.put(movie.getMovieId(), movie);
+    }
+
+    public Movie getMoviesNameToMovieMap(String movieName) {
+        movieName = movieName.toLowerCase();
+        if (!moviesNameToMovieMap.containsKey(movieName)) {
+            throw new NotFoundException("Movie not found");
+        }
+        return moviesNameToMovieMap.get(movieName);
     }
 
     public void initialise() {
@@ -34,5 +41,9 @@ public class MovieService {
 
     public Movie getMovie(UUID movieId) {
         return movieMap.get(movieId);
+    }
+
+    public List<Movie> getAllMovies() {
+        return new ArrayList<>(movieMap.values());
     }
 }

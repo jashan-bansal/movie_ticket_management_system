@@ -1,12 +1,16 @@
 package com.self.tms.services;
 
+import com.self.tms.exceptions.BookingCreateException;
 import com.self.tms.factories.SeatLockingProviderFactory;
 import com.self.tms.interfaces.SeatLockProvider;
 import com.self.tms.models.*;
 import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import javax.ws.rs.NotFoundException;
 import java.util.*;
 import java.util.concurrent.locks.StampedLock;
 
@@ -14,9 +18,10 @@ import java.util.concurrent.locks.StampedLock;
 
 @Service
 @Data
+@Slf4j
 public class BookingService {
     private Map <UUID, Booking> bookingsToIdMap;
-    private final SeatLockProvider<Seat> seatLockProvider;
+    private final SeatLockProvider<String> seatLockProvider;
     private StampedLock lock;
     private final UserService userService;
     private final ShowService showService;
@@ -44,29 +49,63 @@ public class BookingService {
         userBookingMap.put(booking.getUserId(), bookings);
     }
 
-    public void createBooking(UUID showId, List<Seat> userSelectedSeats, UUID userId) {
+    public Booking createBooking(UUID showId, List<String> userSelectedSeats, UUID userId) throws BookingCreateException {
         try {
-            List<Seat> lockedSeats = showService.getShowLockedSeatMap(showId);
+            log.info("Request received to create booking: showId: {}, userSelectedSeats: {}, userId: {}",
+                    showId, userSelectedSeats, userId);
 
-            if (Objects.isNull(lockedSeats) || Objects.isNull(userId)) {
-                throw new RuntimeException("Invalid show or user");
-            }
+            preBookingCreateValidations(showId, userSelectedSeats, userId);
+            log.info("Pre validation check passed");
+            List<String> unavailableSeats = validateShowAndGetUnavailbleSeats(showId);
+            seatLockProvider.lockSeats(lock, unavailableSeats, userSelectedSeats);
+            log.info("Seats locked successfully");
 
-            Boolean isSeatLockSuccessful = seatLockProvider.lockSeats(lock, lockedSeats, userSelectedSeats);
-            if (!isSeatLockSuccessful) {
-                throw new RuntimeException("Seats Allocation Failed! Please try again.");
-            }
-            Booking booking = new Booking(UUID.randomUUID(), showId, userId, Booking.isConfirmed(), userSelectedSeats);
+            Booking booking = Booking.builder()
+                                .id(UUID.randomUUID())
+                                .showId(showId)
+                                .userId(userId)
+                                .allocatedSeats(userSelectedSeats)
+                                .bookingStatus(BookingStatus.Confirmed)
+                                .build();
             addBooking(booking);
             System.out.println("Booking created successfully");
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+
+            return booking;
+        } catch (BookingCreateException | Exception e) {
+            throw e;
         }
+    }
+
+    private List<String> validateShowAndGetUnavailbleSeats(UUID showId) throws BookingCreateException {
+        List<String> unavailableSeats = showService.getShowLockedSeatMap(showId);
+        if (Objects.isNull(unavailableSeats)) {
+            throw new BookingCreateException("Invalid show id! Please provide valid inputs.",
+                    HttpStatus.NO_CONTENT.value());
+        }
+
+        return unavailableSeats;
+    }
+
+    private void preBookingCreateValidations(UUID showId, List<String> userSelectedSeats, UUID userId) throws BookingCreateException {
+        log.info("Validating request to create booking: showId: {}, userSelectedSeats: {}, userId: {}",
+                showId, userSelectedSeats, userId);
+
+        if (Objects.isNull(showId) || Objects.isNull(userSelectedSeats) || Objects.isNull(userId)) {
+            throw new BookingCreateException("Invalid request! Please provide valid showId, seats and userId",
+                    HttpStatus.BAD_REQUEST.value());
+        }
+
+        User user = userService.getUser(userId);
+        if (Objects.isNull(user)) {
+            throw new BookingCreateException("Invalid userId! Please provide valid userId",
+                    HttpStatus.NO_CONTENT.value());
+        }
+
     }
 
     public Booking getBookingDetails(UUID bookingId) {
         if (!bookingsToIdMap.containsKey(bookingId)) {
-            throw new RuntimeException("No such booking!");
+            throw new NotFoundException("No such booking!");
         }
         return bookingsToIdMap.get(bookingId);
     }

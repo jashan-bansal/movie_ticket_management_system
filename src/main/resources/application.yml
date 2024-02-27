@@ -10,4 +10,4 @@ logging:
     console: "%date{ISO8601} - [%level] - [%thread] - [%X{Local_Request_Id}] - %logger{36} - %message%n"
 
 server:
-  port: 8080
+  port: 8889

@@ -1,8 +1,7 @@
-package com.self.tms.resources;
+package com.self.tms.routers;
 
 import com.self.tms.controllers.UserController;
 import com.self.tms.models.request.UserCreateRequest;
-import com.self.tms.services.UserService;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,7 +10,6 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import java.util.UUID;
 
@@ -21,7 +19,7 @@ import java.util.UUID;
 @RequestMapping("/api/v1/user")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
-public class UserResource {
+public class UserRouter {
 
     @Autowired
     private final UserController userController;
@@ -37,7 +35,7 @@ public class UserResource {
     }
 
     @GetMapping("/")
-    public ResponseEntity getUserDetails(@QueryParam("id") UUID userId) {
+    public ResponseEntity getUserDetails(@RequestParam("id") UUID userId) {
         try {
             return userController.getUserDetail(userId);
         } catch (Exception e) {

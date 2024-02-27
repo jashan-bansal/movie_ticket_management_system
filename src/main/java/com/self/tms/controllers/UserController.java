@@ -8,6 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
+import javax.ws.rs.NotFoundException;
+import javax.ws.rs.core.Response;
 import java.util.UUID;
 
 @Component
@@ -38,9 +40,15 @@ public class UserController {
                 return ResponseEntity.badRequest().body("Missing userId!");
             }
             return ResponseEntity.ok(userService.getUser(userId));
-        } catch (Exception e) {
+        } catch (NotFoundException e) {
+            log.error("Error occurred while fetching user: " + e.getMessage());
+            return ResponseEntity.status(Response.Status.NOT_FOUND.getStatusCode())
+                    .body(e.getMessage());
+        }
+        catch (Exception e) {
+            log.error("Error occurred while fetching user: " + e.getMessage());
             e.printStackTrace();
-            throw e;
+            return ResponseEntity.internalServerError().body("Error occurred while fetching user.");
         }
     }
 
