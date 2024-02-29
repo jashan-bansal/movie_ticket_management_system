@@ -14,6 +14,7 @@ import org.springframework.stereotype.Component;
 import javax.ws.rs.NotFoundException;
 import javax.ws.rs.core.Response;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 
@@ -94,11 +95,13 @@ public class BookingController {
                         .body("Invalid request! Please provide valid showId, seats and userId");
             }
 
-            List<ResponseEntity> bookingsResponse = new ArrayList<>();
+            HashMap<UUID, String> userBookingMap = new HashMap<>();
             Thread bookingCreateRequest1 = new Thread(() -> {
                 try {
                     bookingService.createBooking(showId, userSelectedSeats, userIds.get(0));
+                    userBookingMap.put(userIds.get(0), "Booking created successfully");
                 } catch (BookingCreateException e) {
+                    userBookingMap.put(userIds.get(0), "Error occurred while creating booking via thread1: " + e.getMessage());
                     log.error("Error occurred while creating booking via thread1: " + e.getMessage());
                 }
             });
@@ -106,7 +109,9 @@ public class BookingController {
             Thread bookingCreateRequest2 = new Thread(() -> {
                 try {
                     bookingService.createBooking(showId, userSelectedSeats, userIds.get(1));
+                    userBookingMap.put(userIds.get(1), "Booking created successfully");
                 } catch (BookingCreateException e) {
+                    userBookingMap.put(userIds.get(1), "Error occurred while creating booking via thread1: " + e.getMessage());
                     log.error("Error occurred while creating booking via thread2: " + e.getMessage());
                 }
             });
@@ -122,7 +127,7 @@ public class BookingController {
                 throw e;
             }
 
-            return ResponseEntity.ok().body("Booking created successfully");
+            return ResponseEntity.ok().body(userBookingMap);
         } catch (Exception e) {
             e.printStackTrace();
             throw e;
