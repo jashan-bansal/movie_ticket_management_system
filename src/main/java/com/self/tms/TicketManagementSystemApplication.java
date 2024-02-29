@@ -1,10 +1,5 @@
 package com.self.tms;
 
-import com.self.tms.models.Theatre;
-import com.self.tms.services.MovieService;
-import com.self.tms.services.ShowService;
-import com.self.tms.services.TheatreServices;
-import com.self.tms.services.UserService;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 

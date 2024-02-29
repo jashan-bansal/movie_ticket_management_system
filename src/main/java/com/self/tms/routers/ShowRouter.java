@@ -54,8 +54,7 @@ public class ShowRouter {
     @PostMapping("/initialize")
     public ResponseEntity initialize() {
         try {
-            showController.initialize();
-            return ResponseEntity.ok().build();
+            return showController.initialize();
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.internalServerError().build();

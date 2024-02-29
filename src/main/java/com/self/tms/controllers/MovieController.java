@@ -1,5 +1,6 @@
 package com.self.tms.controllers;
 
+import com.self.tms.models.request.MovieCreateRequest;
 import com.self.tms.services.MovieService;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
@@ -45,6 +46,24 @@ public class MovieController {
             log.error("Error occurred while fetching movie details: " + e.getMessage());
             e.printStackTrace();
             throw e;
+        }
+    }
+
+    public ResponseEntity createMovie(MovieCreateRequest movieCreateRequest) {
+        try {
+            String movieName = movieCreateRequest.getMovieName();
+            int movieDurationInMinutes = movieCreateRequest.getMovieDurationInMinutes();
+            log.info("Request received to create movie with name: {}", movieName);
+            if (movieName == null) {
+                log.error("Invalid request to create movie with name: {}", movieName);
+                return ResponseEntity.badRequest().body("Movie name is required! Please provide valid movie name");
+            }
+            movieService.createMovie(movieName, movieDurationInMinutes);
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            log.error("Error occurred while creating movie: " + e.getMessage());
+            e.printStackTrace();
+            return ResponseEntity.internalServerError().body("Error occurred while creating movie.");
         }
     }
 

@@ -99,7 +99,7 @@ public class BookingController {
                 try {
                     bookingService.createBooking(showId, userSelectedSeats, userIds.get(0));
                 } catch (BookingCreateException e) {
-                    throw new RuntimeException(e);
+                    log.error("Error occurred while creating booking via thread1: " + e.getMessage());
                 }
             });
 
@@ -107,7 +107,7 @@ public class BookingController {
                 try {
                     bookingService.createBooking(showId, userSelectedSeats, userIds.get(1));
                 } catch (BookingCreateException e) {
-                    throw new RuntimeException(e);
+                    log.error("Error occurred while creating booking via thread2: " + e.getMessage());
                 }
             });
 

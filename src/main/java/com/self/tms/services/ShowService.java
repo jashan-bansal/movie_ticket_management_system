@@ -1,12 +1,13 @@
 package com.self.tms.services;
 
 
-import com.self.tms.models.Seat;
 import com.self.tms.models.Show;
 import com.self.tms.models.Theatre;
+import jakarta.annotation.PostConstruct;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -22,11 +23,11 @@ public class ShowService {
 
     private Map<UUID, List<String>> showLockedSeatMap;
 
-    private final TheatreServices theatreServices;
+    private final TheatreService theatreServices;
 
 
     @Autowired
-    public ShowService(TheatreServices theatreServices) {
+    public ShowService(TheatreService theatreServices) {
         this.theatreServices = theatreServices;
         showMap = new HashMap<>();
         showLockedSeatMap = new HashMap<>();
@@ -94,6 +95,11 @@ public class ShowService {
             }
         });
         return runningShows;
+    }
+
+    //@PostConstruct
+    public void init() {
+        initializeShows();
     }
 
     public void initializeShows() {

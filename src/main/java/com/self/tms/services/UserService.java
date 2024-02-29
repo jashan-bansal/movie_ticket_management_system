@@ -1,7 +1,10 @@
 package com.self.tms.services;
 
 import com.self.tms.models.User;
+import jakarta.annotation.PostConstruct;
 import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Service;
 
 import javax.ws.rs.NotFoundException;
@@ -9,12 +12,12 @@ import java.util.*;
 
 @Service
 @Data
+@Slf4j
 public class UserService {
     private Map<UUID, User> userMap;
 
     public UserService () {
         userMap = new HashMap<>();
-        initialize();
     }
 
     public void addUser(String name, String email) {
@@ -22,7 +25,13 @@ public class UserService {
         userMap.put(user.getId(), user);
     }
 
-    public void initialize(){
+    @PostConstruct
+    public void init() {
+        initializeUsers();
+    }
+
+    public void initializeUsers(){
+        log.info("Initialising users");
         addUser( "user1", "user1@gmail.com");
         addUser( "user2", "user2@gmail.com");
     }

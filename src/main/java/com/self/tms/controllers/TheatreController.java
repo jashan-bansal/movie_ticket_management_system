@@ -1,7 +1,7 @@
 package com.self.tms.controllers;
 
 import com.self.tms.models.request.TheatreCreateRequest;
-import com.self.tms.services.TheatreServices;
+import com.self.tms.services.TheatreService;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +18,7 @@ import java.util.Objects;
 public class TheatreController {
 
     @Autowired
-    private final TheatreServices theatreService;
+    private final TheatreService theatreService;
 
     public ResponseEntity createTheatre(TheatreCreateRequest theatreCreateRequest) {
         try {

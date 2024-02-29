@@ -81,7 +81,7 @@ public class ShowController {
     public ResponseEntity initialize() {
         try {
             showService.initializeShows();
-            return ResponseEntity.ok().build();
+            return ResponseEntity.ok().body("Shows initialized successfully!");
         } catch (Exception e) {
             e.printStackTrace();
             throw e;
